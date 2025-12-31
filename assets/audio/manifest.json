@@ -1,0 +1,98 @@
+{
+  "generatedAt": "2025-12-25T02:45:30.718Z",
+  "modelId": "eleven_multilingual_v2",
+  "outputFormat": "mp3_44100_128",
+  "outDir": "generated/latency-masks",
+  "personas": {
+    "luna": {
+      "displayName": "Luna",
+      "voiceId": "nbk2esDn4RRk4cVDdoiE",
+      "clips": {
+        "welcome": {
+          "filename": "luna_welcome.mp3",
+          "text": "Hi… I’m Luna.\n\nLet’s slow our breathing…\n\nand drift into the night."
+        },
+        "hook": {
+          "filename": "luna_hook.mp3",
+          "text": "Where should we travel tonight…\n\na snowy forest…\n\na quiet observatory…\n\nor a moonlit sea?"
+        },
+        "mask": {
+          "filename": "luna_mask.mp3",
+          "text": "I’m weaving your story now.\n\nInhale softly…\n\nexhale slowly…\n\nand let your eyelids grow heavy."
+        }
+      }
+    },
+    "kai": {
+      "displayName": "Kai",
+      "voiceId": "KmnvDXRA0HU55Q0aqkPG",
+      "clips": {
+        "welcome": {
+          "filename": "kai_welcome.mp3",
+          "text": "Hey… I’m Kai.\n\nLet your shoulders soften…\n\nas we find calm together."
+        },
+        "hook": {
+          "filename": "kai_hook.mp3",
+          "text": "Do you want waves on the shore…\n\nrain on leaves…\n\nor a slow walk under pines?"
+        },
+        "mask": {
+          "filename": "kai_mask.mp3",
+          "text": "I’m gathering the waves for you.\n\nBreathe in…\n\nand out…\n\nlike the tide returning to shore."
+        }
+      }
+    },
+    "river": {
+      "displayName": "River",
+      "voiceId": "TB3vNRzK8VurMejP889q",
+      "clips": {
+        "welcome": {
+          "filename": "river_welcome.mp3",
+          "text": "Hi… I’m River.\n\nWe’ll wander gently…\n\none quiet step at a time."
+        },
+        "hook": {
+          "filename": "river_hook.mp3",
+          "text": "Where should our path begin…\n\na lantern-lit village…\n\na meadow at dusk…\n\nor a cozy train ride?"
+        },
+        "mask": {
+          "filename": "river_mask.mp3",
+          "text": "I’m shaping the path for our story.\n\nTake three slow breaths…\n\nand let the day fade away."
+        }
+      }
+    },
+    "echo": {
+      "displayName": "Echo",
+      "voiceId": "Qggl4b0xRMiqOwhPtVWT",
+      "clips": {
+        "welcome": {
+          "filename": "echo_welcome.mp3",
+          "text": "Hi… I’m Echo.\n\nLet’s keep everything gentle…\n\nsoft…\n\nand slow."
+        },
+        "hook": {
+          "filename": "echo_hook.mp3",
+          "text": "Which sound relaxes you most…\n\ntapping…\n\nbrushing…\n\nor gentle whispers?"
+        },
+        "mask": {
+          "filename": "echo_mask.mp3",
+          "text": "I’m here with you.\n\nSoften your jaw…\n\nlet your hands rest…\n\nand breathe."
+        }
+      }
+    },
+    "sage": {
+      "displayName": "Sage",
+      "voiceId": "nncOnHs8qpoJX0KnDisb",
+      "clips": {
+        "welcome": {
+          "filename": "sage_welcome.mp3",
+          "text": "Good evening… I’m Sage.\n\nSettle in by the fire, my friend.\n\nYou’re safe here."
+        },
+        "hook": {
+          "filename": "sage_hook.mp3",
+          "text": "Would you like a folk tale…\n\na calm parable…\n\nor a bedtime legend from long ago?"
+        },
+        "mask": {
+          "filename": "sage_mask.mp3",
+          "text": "I’m choosing a gentle tale for you.\n\nBreathe in warmth…\n\nbreathe out worry…\n\nand rest."
+        }
+      }
+    }
+  }
+}

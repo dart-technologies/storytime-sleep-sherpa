@@ -2,9 +2,9 @@
 
 ## ElevenLabs Agents + Google Cloud Vertex AI (Expo SDK 54)
 
-**Project:** AI-powered sleep stories with conversational voice personas, ASMR narration, and social remix
+**Project:** AI-crafted sleep stories with conversational voice personas, ASMR narration, and social remix
 **Platform:** Expo SDK 54 (iOS, React Native)  
-**Tech Stack:** ElevenLabs Agents (Conversational AI) + Vertex AI (Gemini 3 Pro + Vision) + GCP (Storage, OAuth)  
+**Tech Stack:** ElevenLabs Agents (Conversational AI) + Vertex AI (Gemini 3 Pro + Gemini Vision) + GCP (Storage, OAuth)  
 **Duration:** 5-10 minute sleep stories  
 **MVP Timeline:** Dec 31, 2025 @ 5:00pm EST
 
@@ -181,33 +181,36 @@ remixes/{remixId}
 ## 4. IMPLEMENTATION ROADMAP (10 days)
 
 ### Phase 1: Foundation
-- [ ] Expo SDK 54 setup + navigation
-- [ ] Google OAuth integration
-- [ ] UI skeleton (tabs, agent cards, playback)
+- [x] Expo SDK 54 setup + navigation
+- [x] Google OAuth integration
+- [x] UI skeleton (tabs, agent cards, playback)
 
 ### Phase 2: Vertex AI Core
-- [ ] Cloud Functions + Vertex AI Gemini SDK
-- [ ] Vertex AI Vision integration for images
-- [ ] Orchestration layer for Agent <-> Gemini loop
+- [x] Cloud Functions + Vertex AI Gemini SDK
+- [x] Vertex AI Vision integration for images
+- [x] Orchestration layer for Agent <-> Gemini loop
 
 ### Phase 3: ElevenLabs Agents
-- [ ] Agent definition & system prompts
-- [ ] Conversational intake flow implementation
-- [ ] Real-time voice streaming setup
+- [x] Agent definition & system prompts
+- [x] Conversational intake flow implementation
+- [x] Real-time voice streaming setup
 
-### Phase 4: Solstice Pre-Gen
-- [ ] Pre-generate 5-7 featured stories via Vertex AI
-- [ ] Multi-persona audio caching
-- [ ] Pre-generate persona “latency mask” clips (welcome + hook + breathing)
-- [ ] Featured themes carousel
+### Phase 4: Winter Season Pre-Gen
+- [x] Pre-generate 5-7 featured stories via Vertex AI
+- [x] Multi-persona audio caching
+- [x] Pre-generate persona “latency mask” clips (welcome + hook + breathing)
+- [x] Featured themes carousel
 
 ### Phase 5: Social
-- [ ] Firestore favoriting & My Dreams
-- [ ] Social feed with Remix capability
+- [x] Firestore favoriting & My Dreams
+- [x] Social feed with Remix capability
 
 ### Phase 6: Polish
-- [ ] Waveform visualizer (streaming sync)
-- [ ] Sleep timer & background audio
+- [x] Waveform visualizer (streaming sync)
+- [x] Sleep timer & background audio
+- [x] Winter Season styling & micro-animations
+- [x] Safe Area handling (notch/island support)
+- [x] Dynamic configuration (app.config.js)
 - [ ] iOS TestFlight & Submission
 
 ### Phase 7: Demo Preparation
@@ -215,49 +218,63 @@ remixes/{remixId}
 - [ ] GitHub repo setup
 - [ ] Devpost submission
 
+### Phase 8: Refactoring & Polish (Ongoing)
+#### Refactoring
+- [x] **Theme Consolidation:** Ensure all components use the unified glassmorphism theme tokens.
+- [x] **Hook Optimization:** Audit `usePlayback` and `useElevenLabs` for re-render performance.
+- [x] **Error Handling:** Implement global Error Boundaries and toast notifications for API failures.
+- [x] **Type Safety:** Strict TypeScript definitions for all Firestore models and Cloud Function payloads.
+
+#### Polish & Delight
+- [x] **Haptics:** Add `expo-haptics` for tactile feedback on interactions (play/pause, selection).
+- [x] **Transitions:** shared element transitions or layout animations for smooth screen navigation.
+- [x] **Skeletons:** Add shimmering skeleton loaders for image loading states.
+- [x] **Offline UX:** Improve empty states and indicated for offline mode.
+
 **Dec 31 hackathon deadline**
+
+### Phase 9: Distribution & Operations
+- [x] **OTA Updates:** Configure `expo-updates` for seamless over-the-air patches.
+- [x] **EAS Configuration:** Channel mapping (dev/preview/prod) and dynamic environment config.
+- [x] **Offline Resilience:** Network connectivity banners and robust caching.
 
 ---
 
 ## 5. DEMO VIDEO SCRIPT (3 Minutes)
 
-### Scene-by-Scene Breakdown
+### Opener
+> *"Ever have trouble falling asleep? Ever wonder if your dog dreams about you? Now you can dream about your pet! Storytime is your personalized sleep sherpa crafting ASMR experiences based on uploading an image from your day and chatting with a voice agent to refine your narrative's prompt. Let's take a peek at how to Create and Remix stories."*
 
-**SCENE 1: Hook + Value (0:00-0:15)**
-- Visual: Dark UI montage → persona cards → waveform
-- Voice-over: "Storytime is an AI sleep story studio that feels like a conversation — and starts playing instantly."
+### Scene 1: Create Flow (Auth → Luna → Generate)
+1. **Auth** – Sign in with Google
+2. **Luna Create** – Select Luna as our sherpa
+3. **Upload Image** – Upload an image of Dart the Doodle
+4. **Voice Prompt** – *"Tell me a sleep story about Dart the Doodle in NYC, then generate"*
+5. **Voice-Driven Generate** – Agent intake narrated our sleep story then will proceed to play after generating with `complete_intake` client tool
 
-**SCENE 2: Choose A Sherpa (0:15-0:40)**
-- Visual: Scroll personas (Luna/Kai/River/Echo/Sage) → tap a voice preview
-- On-screen text: "ASMR voices • Kid-friendly by default"
-- Echo (voice preview): "Hi… I’m Echo. Let’s keep everything gentle… soft… and slow."
+### Scene 2: Remix Flow (Sage → Share)
+1. **Remix** – Tap the Remix button on the story
+2. **Sage Create** – Select Sage as our new sherpa
+3. **Image Reuse** – Reuse the pre-populated image (skipping upload)
+4. **Skip Intake** – Press Generate directly (bypassing agent conversation)
+5. **Playback** – Story plays (~15 seconds demo)
+6. **Share** – Open menu → Copy shareable story URL → Paste link in Devpost updates
 
-**SCENE 3: Conversational Intake (0:40-1:10)**
-- Visual: Quick back-and-forth (voice or text) + duration picker (5 min)
-- Echo (hook): "Which sound relaxes you most: tapping, brushing, or gentle whispers?"
-- User: chooses brushing + “snowy cabin” vibe
+### Closing
+- **"Storytime: Sleep Sherpa powered by Gemini and ElevenLabs"**
+- **"Beta available on iOS TestFlight."**
 
-**SCENE 4: Instant Start (Latency Mask) (1:10-1:35)**
-- Visual: Tap "Create" → audio starts immediately (pre-generated MP3) while generation runs
-- On-screen text: "Instant audio while AI generates"
-- Echo (mask): "I’m here with you… soften your jaw… let your hands rest… and breathe."
-- Overlay: "Generating with Vertex AI…" + subtle progress indicator
+### Audio Cues (from App Implementation)
 
-**SCENE 5: Optional Image Context (1:35-1:55)**
-- Visual: Upload image → mood tokens → story title appears
-- On-screen text: "Gemini + Vision: image-aware worlds"
-
-**SCENE 6: The ASMR Story (1:55-2:25)**
-- Visual: Full-screen playback with waveform + sleep timer
-- Echo narrates softly over the opening lines (ASMR pacing)
-
-**SCENE 7: Remix (Second Voice: Sage) (2:25-2:50)**
-- Visual: Tap "Remix" → select Sage
-- Audio: Sage starts immediately (latency mask), then transitions into a warm, grandfatherly retelling of the same prompt
-
-**SCENE 8: Closing (2:50-3:00)**
-- Closing slate: "Storytime: Sleep Sherpa powered by Gemini and ElevenLabs"
-- "Beta available on iOS TestFlight."
+| Cue | Trigger | Description |
+|-----|---------|-------------|
+| **Welcome Mask** | Intake screen load | Pre-generated `{persona}_welcome.mp3` — persona greeting while voice session connects |
+| **Hook Mask** | Post-welcome | Pre-generated `{persona}_hook.mp3` — persona asks personalization question |
+| **Latency Mask** | `handleFinish()` | Pre-generated `{persona}_mask.mp3` — calming audio while Vertex AI generates story |
+| **Soundscape** | User toggle or auto | Ambient loops: 🌊 Lapping Waves, 💦 Gentle Raindrops, 🏞️ Flowing Stream, ❄️ Falling Snow, 🔥 Crackling Fireplace |
+| **Ducking** | Mask plays | Soundscape volume ducks to 15% while latency mask plays, restores after |
+| **`complete_intake`** | Agent tool call | ElevenLabs Agent invokes client tool → auto-triggers `handleFinish()` → generation begins |
+| **Story Narration** | Post-generation | Full ASMR narration via ElevenLabs TTS with waveform visualization |
 
 ---
 
@@ -315,11 +332,11 @@ remixes/{remixId}
 
 ### Immediate (Week 1-2)
 - [ ] Custom narrator voice cloning
-- [ ] Push notifications (new remixes)
+- [ ] Push notifications (new publicly-shared remixes)
 
 ### Near-term (Month 1-2)
 - [ ] Android release
-- [ ] Premium tier (generate >10 min duration, custom narrators)
+- [ ] Premium tier (higher daily create cap, longer 10min duration, custom narrators)
 - [ ] Sleep tracking integration (HealthKit)
 
 ### Long-term (Q1-Q2 2026)
@@ -442,7 +459,8 @@ storytime/
 ├── components/
 │   ├── PersonaCard.tsx
 │   ├── WaveformVisualizer.tsx
-│   └── PlaybackControls.tsx
+│   └── playback/
+│       └── PlaybackFooter.tsx
 ├── hooks/
 │   ├── useGemini.ts
 │   ├── useElevenLabs.ts
@@ -460,19 +478,19 @@ storytime/
 
 ## 11. TESTING CHECKLIST
 
-- [ ] Google OAuth login works
-- [ ] Persona preview audio plays (all 5)
-- [ ] Image upload → Vertex AI Vision analysis
-- [ ] Story generation <3 seconds
-- [ ] ElevenLabs narration streams smoothly
-- [ ] Waveform visualization animates
-- [ ] Playback controls respond immediately
-- [ ] Like button saves to Firestore
-- [ ] Favorites persist across restart
-- [ ] Winter stories appear on home
-- [ ] Sleep timer countdown works
-- [ ] Offline downloads
-- [ ] iOS app builds successfully
+- [x] Google OAuth login works
+- [x] Persona preview audio plays (all 5)
+- [x] Image upload → Vertex AI Vision analysis
+- [x] Story generation <3 seconds
+- [x] ElevenLabs narration streams smoothly
+- [x] Waveform visualization animates
+- [x] Playback controls respond immediately
+- [x] Like button saves to Firestore
+- [x] Favorites persist across restart
+- [x] Winter stories appear on home
+- [x] Sleep timer countdown works
+- [x] Background audio & volume fade out
+- [x] iOS app builds successfully
 
 ---
 

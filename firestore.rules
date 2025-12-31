@@ -1,0 +1,52 @@
+rules_version = '2';
+
+service cloud.firestore {
+    match /databases/{database}/documents {
+        function isSignedIn() {
+            return request.auth != null;
+        }
+
+        function isOwner(data) {
+            return isSignedIn() && data.userId == request.auth.uid;
+        }
+
+        match /stories/{storyId} {
+            allow create: if isSignedIn()
+                && request.resource.data.userId == request.auth.uid
+                && request.resource.data.isPublic is bool
+                && request.resource.data.isFeatured is bool
+                && request.resource.data.isFeatured == false
+                && request.resource.data.createdAt is number;
+
+            // Public stories should be readable even when signed out (Featured + share flows).
+            allow read: if isOwner(resource.data) || resource.data.isPublic == true;
+
+            allow update: if isOwner(resource.data)
+                && request.resource.data.userId == resource.data.userId
+                && request.resource.data.createdAt == resource.data.createdAt
+                && request.resource.data.isPublic is bool
+                && (!request.resource.data.keys().hasAny(['isFeatured']) || request.resource.data.isFeatured is bool)
+                && (
+                    !request.resource.data.keys().hasAny(['isFeatured'])
+                    || request.resource.data.isFeatured == resource.data.isFeatured
+                    || request.resource.data.isFeatured == false
+                )
+                && !(request.resource.data.isPublic == false && request.resource.data.isFeatured == true);
+
+            allow delete: if isOwner(resource.data);
+        }
+
+        match /users/{userId} {
+            allow read, create, update, delete: if isSignedIn() && request.auth.uid == userId;
+
+            match /favorites/{storyId} {
+                allow read, create, update, delete: if isSignedIn() && request.auth.uid == userId;
+            }
+        }
+
+        match /config/{docId} {
+            allow read: if isSignedIn();
+            allow write: if false;
+        }
+    }
+}

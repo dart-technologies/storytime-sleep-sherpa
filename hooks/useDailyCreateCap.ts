@@ -7,9 +7,10 @@ type State =
     | { status: 'loaded'; data: DailyCreateState }
     | { status: 'error'; message: string };
 
-export function useDailyCreateCap() {
+export function useDailyCreateCap(userId?: string | null) {
     const [state, setState] = useState<State>({ status: 'loading' });
     const mountedRef = useRef(true);
+    const uid = typeof userId === 'string' && userId.trim() ? userId.trim() : auth.currentUser?.uid;
 
     useEffect(() => {
         mountedRef.current = true;
@@ -19,7 +20,6 @@ export function useDailyCreateCap() {
     }, []);
 
     const refresh = useCallback(async () => {
-        const uid = auth.currentUser?.uid;
         if (!uid) {
             setState({
                 status: 'loaded',
@@ -45,19 +45,18 @@ export function useDailyCreateCap() {
             if (!mountedRef.current) return;
             setState({ status: 'error', message: message || 'Could not load daily cap.' });
         }
-    }, []);
+    }, [uid]);
 
     useEffect(() => {
         void refresh();
     }, [refresh]);
 
     const increment = useCallback(async () => {
-        const uid = auth.currentUser?.uid;
         if (!uid) return;
         const next = await incrementDailyCreateCount(uid);
         if (!mountedRef.current) return;
         setState({ status: 'loaded', data: next });
-    }, []);
+    }, [uid]);
 
     const data = useMemo(() => {
         if (state.status === 'loaded') return state.data;

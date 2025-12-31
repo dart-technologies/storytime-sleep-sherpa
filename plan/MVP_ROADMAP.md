@@ -211,12 +211,12 @@ remixes/{remixId}
 - [x] Winter Season styling & micro-animations
 - [x] Safe Area handling (notch/island support)
 - [x] Dynamic configuration (app.config.js)
-- [ ] iOS TestFlight & Submission
+- [x] iOS TestFlight & Submission
 
 ### Phase 7: Demo Preparation
-- [ ] Demo video recording
-- [ ] GitHub repo setup
-- [ ] Devpost submission
+- [x] Demo video recording
+- [x] GitHub repo setup
+- [x] Devpost submission
 
 ### Phase 8: Refactoring & Polish (Ongoing)
 #### Refactoring

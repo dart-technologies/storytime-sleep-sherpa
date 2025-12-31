@@ -1069,7 +1069,9 @@ export const share = onRequest(
                 .join('');
 
             const testFlightUrlRaw = (process.env.EXPO_PUBLIC_TESTFLIGHT_URL || process.env.TESTFLIGHT_URL || '').trim();
-            const testFlightUrl = /^https?:\/\//i.test(testFlightUrlRaw) ? testFlightUrlRaw : 'https://testflight.apple.com/';
+            const testFlightUrl = /^https?:\/\//i.test(testFlightUrlRaw)
+                ? testFlightUrlRaw
+                : 'https://testflight.apple.com/join/5X3eGRNA';
             const brandBlock = [
                 `<a class="brand" href="${escapeHtml(testFlightUrl)}" target="_blank" rel="noopener noreferrer">`,
                 `<img src="${escapeHtml(faviconUrl)}" alt="Storytime" />`,

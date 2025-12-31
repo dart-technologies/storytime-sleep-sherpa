@@ -9,6 +9,7 @@
         "build:ios:sim": "eas build --local -p ios --profile development-simulator",
         "build:ios:dev": "eas build -p ios --profile development",
         "build:ios:prod": "eas build -p ios --profile production --non-interactive",
+        "update:ios": "eas update -p ios --channel production",
         "web": "expo start --web",
         "test": "jest --watchAll",
         "test:ci": "CI=1 node ./node_modules/jest/bin/jest.js --watchman=false --runInBand",

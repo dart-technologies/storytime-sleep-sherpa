@@ -51,7 +51,7 @@ export async function fetchAppRuntimeConfig(options?: { maxAgeMs?: number }): Pr
     const now = Date.now();
     const maxAgeMsRaw = options?.maxAgeMs;
     const maxAgeMs =
-        typeof maxAgeMsRaw === 'number' && Number.isFinite(maxAgeMsRaw) ? Math.max(0, maxAgeMsRaw) : 60_000;
+        typeof maxAgeMsRaw === 'number' && Number.isFinite(maxAgeMsRaw) ? Math.max(0, maxAgeMsRaw) : 10_000;
 
     if (cachedConfig && now - cachedAtMs < maxAgeMs) {
         return cachedConfig;

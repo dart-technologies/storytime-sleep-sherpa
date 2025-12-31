@@ -2,8 +2,40 @@ function trim(value: string | undefined): string {
     return (value || '').trim();
 }
 
-function getEnv(name: string): string | undefined {
-    return process.env[name];
+/**
+ * Expo only inlines `process.env.EXPO_PUBLIC_*` for *static* property access. Accessing env vars via
+ * `process.env[name]` works in Node/dev, but can be `undefined` in production JS bundles.
+ *
+ * Strategy:
+ * - Read runtime env when available (tests / dev).
+ * - Otherwise fall back to an object whose values are populated via static `process.env.EXPO_PUBLIC_*` access
+ *   (so Metro/EAS can inline them at build/update time).
+ */
+const INLINED_EXPO_PUBLIC_ENV = {
+    EXPO_PUBLIC_FIREBASE_PROJECT_ID: process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID,
+    EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN,
+    EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET: process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET,
+    EXPO_PUBLIC_FIREBASE_DATABASE_URL: process.env.EXPO_PUBLIC_FIREBASE_DATABASE_URL,
+    EXPO_PUBLIC_FIREBASE_FUNCTIONS_REGION: process.env.EXPO_PUBLIC_FIREBASE_FUNCTIONS_REGION,
+    EXPO_PUBLIC_CLOUD_FUNCTIONS_REGION: process.env.EXPO_PUBLIC_CLOUD_FUNCTIONS_REGION,
+    EXPO_PUBLIC_CLOUD_FUNCTIONS_URL: process.env.EXPO_PUBLIC_CLOUD_FUNCTIONS_URL,
+    EXPO_PUBLIC_CLOUD_FUNCTION_GENERATE: process.env.EXPO_PUBLIC_CLOUD_FUNCTION_GENERATE,
+    EXPO_PUBLIC_CLOUD_FUNCTION_NARRATE: process.env.EXPO_PUBLIC_CLOUD_FUNCTION_NARRATE,
+    EXPO_PUBLIC_CLOUD_FUNCTION_VISION: process.env.EXPO_PUBLIC_CLOUD_FUNCTION_VISION,
+    EXPO_PUBLIC_CLOUD_FUNCTION_ILLUSTRATE: process.env.EXPO_PUBLIC_CLOUD_FUNCTION_ILLUSTRATE,
+    EXPO_PUBLIC_CLOUD_FUNCTION_INTAKE: process.env.EXPO_PUBLIC_CLOUD_FUNCTION_INTAKE,
+    EXPO_PUBLIC_CLOUD_FUNCTION_ELEVENLABS_TOKEN: process.env.EXPO_PUBLIC_CLOUD_FUNCTION_ELEVENLABS_TOKEN,
+    EXPO_PUBLIC_CLOUD_FUNCTION_SHARED_STORY: process.env.EXPO_PUBLIC_CLOUD_FUNCTION_SHARED_STORY,
+    EXPO_PUBLIC_CLOUD_FUNCTION_STORY_PLAY: process.env.EXPO_PUBLIC_CLOUD_FUNCTION_STORY_PLAY,
+} as const;
+
+type ExpoPublicEnvKey = keyof typeof INLINED_EXPO_PUBLIC_ENV;
+
+function getExpoPublicEnv(key: ExpoPublicEnvKey): string | undefined {
+    const runtimeEnv = (process.env || {}) as Record<string, string | undefined>;
+    const runtimeValue = runtimeEnv[key];
+    if (typeof process.env.JEST_WORKER_ID === 'string') return runtimeValue;
+    return runtimeValue !== undefined ? runtimeValue : INLINED_EXPO_PUBLIC_ENV[key];
 }
 
 export function isHttpUrl(value: string): boolean {
@@ -11,18 +43,18 @@ export function isHttpUrl(value: string): boolean {
 }
 
 export function getFirebaseProjectIdFromEnv(): string | null {
-    const explicit = trim(getEnv('EXPO_PUBLIC_FIREBASE_PROJECT_ID'));
+    const explicit = trim(getExpoPublicEnv('EXPO_PUBLIC_FIREBASE_PROJECT_ID'));
     if (explicit && /^[a-z0-9-]+$/i.test(explicit)) return explicit;
 
-    const authDomain = trim(getEnv('EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN'));
+    const authDomain = trim(getExpoPublicEnv('EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN'));
     const authDomainMatch = authDomain.match(/^([a-z0-9-]+)\.(?:firebaseapp\.com|web\.app)$/i);
     if (authDomainMatch?.[1]) return authDomainMatch[1];
 
-    const storageBucket = trim(getEnv('EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET'));
+    const storageBucket = trim(getExpoPublicEnv('EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET'));
     const bucketMatch = storageBucket.match(/^([a-z0-9-]+)\.(?:appspot\.com|firebasestorage\.app)$/i);
     if (bucketMatch?.[1]) return bucketMatch[1];
 
-    const databaseUrl = trim(getEnv('EXPO_PUBLIC_FIREBASE_DATABASE_URL'));
+    const databaseUrl = trim(getExpoPublicEnv('EXPO_PUBLIC_FIREBASE_DATABASE_URL'));
     const databaseMatch = databaseUrl.match(
         /^https?:\/\/([a-z0-9-]+)(?:-default-rtdb)?\.(?:firebaseio\.com|firebasedatabase\.app)(?:\/|$)/i
     );
@@ -93,8 +125,8 @@ function inferCloudFunctionsUrlFromFirebaseProjectId(functionName: string): stri
     if (!projectId) return null;
 
     const region =
-        trim(getEnv('EXPO_PUBLIC_FIREBASE_FUNCTIONS_REGION')) ||
-        trim(getEnv('EXPO_PUBLIC_CLOUD_FUNCTIONS_REGION')) ||
+        trim(getExpoPublicEnv('EXPO_PUBLIC_FIREBASE_FUNCTIONS_REGION')) ||
+        trim(getExpoPublicEnv('EXPO_PUBLIC_CLOUD_FUNCTIONS_REGION')) ||
         'us-central1';
 
     if (!/^[a-z0-9-]+$/i.test(region)) return null;
@@ -104,7 +136,7 @@ function inferCloudFunctionsUrlFromFirebaseProjectId(functionName: string): stri
 }
 
 export function resolveCloudFunctionUrlFromEnv(endpoint: string | undefined, fallbackEnvVar: string): string {
-    const baseUrl = trim(getEnv('EXPO_PUBLIC_CLOUD_FUNCTIONS_URL'));
+    const baseUrl = trim(getExpoPublicEnv('EXPO_PUBLIC_CLOUD_FUNCTIONS_URL'));
     const url = resolveCloudFunctionUrl(baseUrl, endpoint);
     if (url) return url;
 
@@ -131,9 +163,9 @@ export type GeminiCloudEndpoints = {
 };
 
 export function getGeminiCloudEndpointsFromEnv(): GeminiCloudEndpoints {
-    const generate = trim(getEnv('EXPO_PUBLIC_CLOUD_FUNCTION_GENERATE') || '/generate');
-    const vision = trim(getEnv('EXPO_PUBLIC_CLOUD_FUNCTION_VISION') || '/vision');
-    const illustrateEnv = trim(getEnv('EXPO_PUBLIC_CLOUD_FUNCTION_ILLUSTRATE'));
+    const generate = trim(getExpoPublicEnv('EXPO_PUBLIC_CLOUD_FUNCTION_GENERATE') || '/generate');
+    const vision = trim(getExpoPublicEnv('EXPO_PUBLIC_CLOUD_FUNCTION_VISION') || '/vision');
+    const illustrateEnv = trim(getExpoPublicEnv('EXPO_PUBLIC_CLOUD_FUNCTION_ILLUSTRATE'));
 
     const inferredIllustrate =
         inferSiblingCloudRunUrl(vision, 'illustrate') ||
@@ -149,11 +181,11 @@ export function getGeminiCloudEndpointsFromEnv(): GeminiCloudEndpoints {
 }
 
 export function getNarrateCloudEndpointFromEnv(): string {
-    const narrate = trim(getEnv('EXPO_PUBLIC_CLOUD_FUNCTION_NARRATE'));
+    const narrate = trim(getExpoPublicEnv('EXPO_PUBLIC_CLOUD_FUNCTION_NARRATE'));
     if (narrate) return narrate;
 
-    const generate = trim(getEnv('EXPO_PUBLIC_CLOUD_FUNCTION_GENERATE'));
-    const vision = trim(getEnv('EXPO_PUBLIC_CLOUD_FUNCTION_VISION'));
+    const generate = trim(getExpoPublicEnv('EXPO_PUBLIC_CLOUD_FUNCTION_GENERATE'));
+    const vision = trim(getExpoPublicEnv('EXPO_PUBLIC_CLOUD_FUNCTION_VISION'));
     const inferred =
         inferSiblingCloudRunUrl(generate, 'narrate') ||
         inferSiblingCloudRunUrl(vision, 'narrate') ||
@@ -164,17 +196,17 @@ export function getNarrateCloudEndpointFromEnv(): string {
 }
 
 export function getSharedStoryCloudEndpointFromEnv(): string {
-    const baseUrl = trim(getEnv('EXPO_PUBLIC_CLOUD_FUNCTIONS_URL'));
-    const explicit = trim(getEnv('EXPO_PUBLIC_CLOUD_FUNCTION_SHARED_STORY'));
+    const baseUrl = trim(getExpoPublicEnv('EXPO_PUBLIC_CLOUD_FUNCTIONS_URL'));
+    const explicit = trim(getExpoPublicEnv('EXPO_PUBLIC_CLOUD_FUNCTION_SHARED_STORY'));
     const explicitResolved = resolveCloudFunctionUrl(baseUrl, explicit);
     if (explicitResolved) return explicitResolved;
 
-    const intake = trim(getEnv('EXPO_PUBLIC_CLOUD_FUNCTION_INTAKE'));
-    const generate = trim(getEnv('EXPO_PUBLIC_CLOUD_FUNCTION_GENERATE'));
-    const vision = trim(getEnv('EXPO_PUBLIC_CLOUD_FUNCTION_VISION'));
-    const narrate = trim(getEnv('EXPO_PUBLIC_CLOUD_FUNCTION_NARRATE'));
-    const elevenlabsToken = trim(getEnv('EXPO_PUBLIC_CLOUD_FUNCTION_ELEVENLABS_TOKEN'));
-    const illustrate = trim(getEnv('EXPO_PUBLIC_CLOUD_FUNCTION_ILLUSTRATE'));
+    const intake = trim(getExpoPublicEnv('EXPO_PUBLIC_CLOUD_FUNCTION_INTAKE'));
+    const generate = trim(getExpoPublicEnv('EXPO_PUBLIC_CLOUD_FUNCTION_GENERATE'));
+    const vision = trim(getExpoPublicEnv('EXPO_PUBLIC_CLOUD_FUNCTION_VISION'));
+    const narrate = trim(getExpoPublicEnv('EXPO_PUBLIC_CLOUD_FUNCTION_NARRATE'));
+    const elevenlabsToken = trim(getExpoPublicEnv('EXPO_PUBLIC_CLOUD_FUNCTION_ELEVENLABS_TOKEN'));
+    const illustrate = trim(getExpoPublicEnv('EXPO_PUBLIC_CLOUD_FUNCTION_ILLUSTRATE'));
 
     const inferred =
         inferSiblingCloudRunUrl(generate, 'sharedstory') ||
@@ -190,16 +222,16 @@ export function getSharedStoryCloudEndpointFromEnv(): string {
 }
 
 export function getStoryPlayCloudEndpointFromEnv(): string {
-    const baseUrl = trim(getEnv('EXPO_PUBLIC_CLOUD_FUNCTIONS_URL'));
-    const explicit = trim(getEnv('EXPO_PUBLIC_CLOUD_FUNCTION_STORY_PLAY'));
+    const baseUrl = trim(getExpoPublicEnv('EXPO_PUBLIC_CLOUD_FUNCTIONS_URL'));
+    const explicit = trim(getExpoPublicEnv('EXPO_PUBLIC_CLOUD_FUNCTION_STORY_PLAY'));
     const explicitResolved = resolveCloudFunctionUrl(baseUrl, explicit);
     if (explicitResolved) return explicitResolved;
 
-    const intake = trim(getEnv('EXPO_PUBLIC_CLOUD_FUNCTION_INTAKE'));
-    const generate = trim(getEnv('EXPO_PUBLIC_CLOUD_FUNCTION_GENERATE'));
-    const vision = trim(getEnv('EXPO_PUBLIC_CLOUD_FUNCTION_VISION'));
-    const narrate = trim(getEnv('EXPO_PUBLIC_CLOUD_FUNCTION_NARRATE'));
-    const sharedStory = trim(getEnv('EXPO_PUBLIC_CLOUD_FUNCTION_SHARED_STORY'));
+    const intake = trim(getExpoPublicEnv('EXPO_PUBLIC_CLOUD_FUNCTION_INTAKE'));
+    const generate = trim(getExpoPublicEnv('EXPO_PUBLIC_CLOUD_FUNCTION_GENERATE'));
+    const vision = trim(getExpoPublicEnv('EXPO_PUBLIC_CLOUD_FUNCTION_VISION'));
+    const narrate = trim(getExpoPublicEnv('EXPO_PUBLIC_CLOUD_FUNCTION_NARRATE'));
+    const sharedStory = trim(getExpoPublicEnv('EXPO_PUBLIC_CLOUD_FUNCTION_SHARED_STORY'));
 
     const inferred =
         inferSiblingCloudRunUrl(sharedStory, 'storyplay') ||

@@ -23,7 +23,7 @@ export default function SettingsScreen() {
     const showDebug = isDebugLoggingEnabled();
     const { enabled: offlineFavoritesEnabled, loading: offlineFavoritesLoading, setEnabled: setOfflineFavoritesEnabled } = useOfflineFavoritesDownloadsEnabled();
     const offlineFavoritesStats = useOfflineFavoritesDownloadsStats();
-    const dailyCap = useDailyCreateCap();
+    const dailyCap = useDailyCreateCap(user?.uid);
     const { myStories } = useStories();
 
     const offlineDownloadsDetail = useMemo(() => {

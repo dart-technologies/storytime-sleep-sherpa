@@ -5,8 +5,18 @@ function trim(value: string | undefined): string {
     return (value || '').trim();
 }
 
-function getEnv(name: string): string | undefined {
-    return process.env[name];
+const INLINED_EXPO_PUBLIC_ENV = {
+    EXPO_PUBLIC_WEB_BASE_URL: process.env.EXPO_PUBLIC_WEB_BASE_URL,
+    EXPO_PUBLIC_SHARE_BASE_URL: process.env.EXPO_PUBLIC_SHARE_BASE_URL,
+} as const;
+
+type ExpoPublicEnvKey = keyof typeof INLINED_EXPO_PUBLIC_ENV;
+
+function getExpoPublicEnv(key: ExpoPublicEnvKey): string | undefined {
+    const runtimeEnv = (process.env || {}) as Record<string, string | undefined>;
+    const runtimeValue = runtimeEnv[key];
+    if (typeof process.env.JEST_WORKER_ID === 'string') return runtimeValue;
+    return runtimeValue !== undefined ? runtimeValue : INLINED_EXPO_PUBLIC_ENV[key];
 }
 
 function isValidHttpBaseUrl(value: string): boolean {
@@ -53,13 +63,13 @@ function inferFirebaseHostingBaseUrlFromAssetUrls(assetUrls: Array<string | unde
 }
 
 export function getWebBaseUrlFromEnv(): string | null {
-    const baseUrl = trim(getEnv('EXPO_PUBLIC_WEB_BASE_URL'));
+    const baseUrl = trim(getExpoPublicEnv('EXPO_PUBLIC_WEB_BASE_URL'));
     if (!isValidHttpBaseUrl(baseUrl)) return null;
     return baseUrl.replace(/\/+$/, '');
 }
 
 export function getShareBaseUrlFromEnv(): string | null {
-    const shareBaseUrl = trim(getEnv('EXPO_PUBLIC_SHARE_BASE_URL'));
+    const shareBaseUrl = trim(getExpoPublicEnv('EXPO_PUBLIC_SHARE_BASE_URL'));
     if (shareBaseUrl && isValidHttpBaseUrl(shareBaseUrl)) {
         return shareBaseUrl.replace(/\/+$/, '');
     }
